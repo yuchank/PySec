@@ -30,25 +30,35 @@ if __name__ == '__main__':
     make_virus_db()
     if len(sys.argv) != 2:
         print('Usage: antivirus.py [file]')
+        exit(0)
 
-fp = open('./samples/eicar.txt', 'rb')
-fb = fp.read()
-fp.close()
+    fname = sys.argv[1]
 
-# if fb[0:3] == b'X5O':
-#     print('Virus')
-#     os.remove('./samples/2eicar.txt')
-# else:
-#     print('No Virus')
+    fp = open(fname, 'rb')
+    fb = fp.read()
+    fp.close()
 
-m = hashlib.md5()
-# m.update('hello'.encode('utf-8'))
-m.update(fb)
-fmd5 = m.hexdigest()
-print(fmd5)
+    # if fb[0:3] == b'X5O':
+    #     print('Virus')
+    #     os.remove('./samples/2eicar.txt')
+    # else:
+    #     print('No Virus')
 
-if fmd5 == '44d88612fea8a8f36de82e1278abb02f':
-    print('Virus')
-    os.remove('./samples/eicar.txt')
-else:
-    print('No Virus')
+    m = hashlib.md5()
+    # m.update('hello'.encode('utf-8'))
+    m.update(fb)
+    fmd5 = m.hexdigest()
+    # print(fmd5)
+
+    ret, vname = search_vdb(fmd5)
+    if ret:
+        print('%s : %s' % (fname, vname))
+        os.remove(fname)
+    else:
+        print('%s : ok' % fname)
+
+    # if fmd5 == '44d88612fea8a8f36de82e1278abb02f':
+    #     print('Virus')
+    #     os.remove('./samples/eicar.txt')
+    # else:
+    #     print('No Virus')
