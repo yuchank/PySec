@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import hashlib
 import zlib
@@ -7,6 +9,7 @@ import curemod
 
 VirusDB = []    # malware pattern
 vdb = []
+sdb = []
 vsize = []
 
 
@@ -61,13 +64,23 @@ def make_virus_db():
     for pattern in VirusDB:
         t = []
         v = pattern.split(':')
-        t.append(v[1])  # MD5 hash
-        t.append(v[2])  # name
-        vdb.append(t)
 
-        size = int(v[0])
-        if vsize.count(size) == 0:
-            vsize.append(size)
+        scan_func = v[0]
+        # cure_func = v[1]
+
+        if scan_func == 'scan_md5':
+            t.append(v[3])  # MD5 hash
+            t.append(v[4])  # name
+            vdb.append(t)
+
+            size = int(v[2])
+            if vsize.count(size) == 0:
+                vsize.append(size)
+        elif scan_func == 'scan_str':
+            t.append(int(v[2]))  # offset
+            t.append(v[3])  # string
+            t.append(v[4])  # name
+            sdb.append(t)
 
 
 if __name__ == '__main__':
@@ -76,11 +89,11 @@ if __name__ == '__main__':
 
     if len(sys.argv) != 2:
         print('Usage: antivirus.py [file]')
-        exit(0)
+        sys.exit(0)
 
     fname = sys.argv[1]
 
-    ret, vname = scanmod.scan_md5(vdb, vsize, fname)
+    ret, vname = scanmod.scan_virus(vdb, vsize, sdb, fname)
     if ret:
         print('%s : %s' % (fname, vname))
         curemod.cure_delete(fname)
